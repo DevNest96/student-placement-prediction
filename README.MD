@@ -116,7 +116,7 @@ This project serves as the foundation for a formal **research study**. It struct
 ---
 
 ## 👤 Author
-Developed and Researched by **Tanishk Raj**
+Developed and Researched by Alok Kumar Gupta
 
 <p align="center">
   <i>If you found this project helpful, please consider leaving a ⭐ on the repository!</i>

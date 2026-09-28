@@ -1,0 +1,140 @@
+{
+  "best_model": "Logistic Regression",
+  "metrics": {
+    "Logistic Regression": {
+      "accuracy": 80.85,
+      "precision": 76.95,
+      "recall": 77.59,
+      "f1_score": 77.27,
+      "roc_auc": 88.37,
+      "confusion_matrix": [
+        [
+          966,
+          195
+        ],
+        [
+          188,
+          651
+        ]
+      ]
+    },
+    "Random Forest": {
+      "accuracy": 78.75,
+      "precision": 75.81,
+      "recall": 72.47,
+      "f1_score": 74.1,
+      "roc_auc": 86.68,
+      "confusion_matrix": [
+        [
+          967,
+          194
+        ],
+        [
+          231,
+          608
+        ]
+      ]
+    },
+    "KNN": {
+      "accuracy": 77.8,
+      "precision": 74.11,
+      "recall": 72.35,
+      "f1_score": 73.22,
+      "roc_auc": 83.89,
+      "confusion_matrix": [
+        [
+          949,
+          212
+        ],
+        [
+          232,
+          607
+        ]
+      ]
+    },
+    "Decision Tree": {
+      "accuracy": 78.05,
+      "precision": 73.47,
+      "recall": 74.61,
+      "f1_score": 74.04,
+      "roc_auc": 85.81,
+      "confusion_matrix": [
+        [
+          935,
+          226
+        ],
+        [
+          213,
+          626
+        ]
+      ]
+    },
+    "Naive Bayes": {
+      "accuracy": 80.05,
+      "precision": 74.5,
+      "recall": 79.74,
+      "f1_score": 77.03,
+      "roc_auc": 88.47,
+      "confusion_matrix": [
+        [
+          932,
+          229
+        ],
+        [
+          170,
+          669
+        ]
+      ]
+    }
+  },
+  "feature_importance": {
+    "CGPA": 0.2575,
+    "Internships": -0.0109,
+    "Projects": 0.2544,
+    "Workshops/Certifications": 0.0951,
+    "AptitudeTestScore": 0.6108,
+    "SoftSkillsRating": 0.2634,
+    "ExtracurricularActivities_Enc": 0.3604,
+    "PlacementTraining_Enc": 0.392,
+    "SSC_Marks": 0.2826,
+    "HSC_Marks": 0.2212
+  },
+  "stats": {
+    "total_records": 10000,
+    "features": [
+      "CGPA",
+      "Internships",
+      "Projects",
+      "Workshops/Certifications",
+      "AptitudeTestScore",
+      "SoftSkillsRating",
+      "ExtracurricularActivities_Enc",
+      "PlacementTraining_Enc",
+      "SSC_Marks",
+      "HSC_Marks"
+    ],
+    "placed_count": 4197,
+    "not_placed_count": 5803,
+    "placement_rate": 41.97,
+    "averages": {
+      "cgpa": 7.7,
+      "aptitude": 79.45,
+      "projects": 2.0,
+      "ssc": 69.2,
+      "hsc": 74.5,
+      "soft_skills": 4.32
+    }
+  },
+  "feature_columns": [
+    "CGPA",
+    "Internships",
+    "Projects",
+    "Workshops/Certifications",
+    "AptitudeTestScore",
+    "SoftSkillsRating",
+    "ExtracurricularActivities_Enc",
+    "PlacementTraining_Enc",
+    "SSC_Marks",
+    "HSC_Marks"
+  ]
+}

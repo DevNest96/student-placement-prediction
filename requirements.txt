@@ -1,5 +1,7 @@
-numpy
-pandas
-matplotlib
-seaborn
-scikit-learn
+numpy>=1.26.0
+pandas>=2.2.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+scikit-learn==1.5.2
+Flask>=3.0.0
+joblib>=1.3.0

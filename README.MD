@@ -101,12 +101,31 @@ Follow these instructions to set up and run the machine learning analysis on you
    pip install -r requirements.txt
    ```
 
-3. **Run the Jupyter Notebook:**
-   Launch Jupyter Notebook to view the code, visualizations, and model evaluations interactively.
+3. **Run the Interactive Web Application (Recommended):**
+   Launch the modern dashboard to test student profiles with live probability meters and multi-model consensus:
    ```bash
-   jupyter notebook Placement_analysis.ipynb
+   python main.py --web
    ```
-   *(Alternatively, you can open the notebook via VS Code or JupyterLab).*
+   Then open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
+
+4. **Run CLI Predictions & Model Training:**
+   ```bash
+   # Train all models and print evaluation benchmark table
+   python main.py --train
+
+   # Run placement prediction for a student profile
+   python main.py --predict --cgpa 8.5 --aptitude 88 --projects 3
+
+   # Execute the Jupyter notebook end-to-end
+   python main.py --notebook
+   ```
+
+5. **Run the Jupyter Notebook interactively:**
+   Launch Jupyter Notebook to view the code, visualizations, and model evaluations interactively:
+   ```bash
+   jupyter notebook AlokGupta_Placement_analysis.ipynb
+   ```
+   *(Alternatively, open the notebook in VS Code or JupyterLab).*
 
 ---
 

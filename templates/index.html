@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Placement Prediction System | AI Analytics Dashboard</title>
+    <meta name="description" content="AI-powered predictive analytics engine for student placement forecasting using machine learning algorithms.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="navbar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">PlacePredict <span class="badge-ai">AI 2.0</span></h1>
+                    <p class="brand-subtitle">Student Employability & Placement Intelligence</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="model-status-chip" id="modelStatusChip">
+                    <span class="status-dot"></span>
+                    <span class="model-name">Champion: {{ metadata.best_model }}</span>
+                    <span class="model-acc">{{ metadata.metrics[metadata.best_model].accuracy }}% Acc</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI Strip -->
+        <section class="kpi-strip" aria-label="Key Performance Metrics">
+            <div class="kpi-card">
+                <span class="kpi-label">Training Records</span>
+                <span class="kpi-value" id="kpiRecords">{{ "{:,}".format(metadata.stats.total_records) }}</span>
+                <span class="kpi-sub">Empirical Student Profiles</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Champion Accuracy</span>
+                <span class="kpi-value highlight-emerald" id="kpiAccuracy">{{ metadata.metrics[metadata.best_model].accuracy }}%</span>
+                <span class="kpi-sub">{{ metadata.best_model }}</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Peak ROC-AUC</span>
+                <span class="kpi-value highlight-cyan">{{ metadata.metrics['Naive Bayes'].roc_auc }}%</span>
+                <span class="kpi-sub">Discrimination Capacity</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Evaluated Models</span>
+                <span class="kpi-value highlight-indigo">5 Algorithms</span>
+                <span class="kpi-sub">Ensemble Consensus</span>
+            </div>
+        </section>
+
+        <!-- Main Workspace -->
+        <main class="workspace-grid">
+            <!-- Left Panel: Input Controls -->
+            <section class="panel glass-panel input-panel" aria-labelledby="input-heading">
+                <div class="panel-header">
+                    <div>
+                        <h2 id="input-heading" class="panel-title">Student Profile Studio</h2>
+                        <p class="panel-description">Adjust academic & practical parameters or select a quick archetype.</p>
+                    </div>
+                </div>
+
+                <!-- Preset Buttons -->
+                <div class="preset-section">
+                    <span class="preset-title">Quick Archetypes:</span>
+                    <div class="preset-buttons">
+                        <button type="button" class="preset-btn" data-preset="top" id="presetTopBtn">
+                            <span>Top Scholar</span>
+                        </button>
+                        <button type="button" class="preset-btn active" data-preset="balanced" id="presetBalancedBtn">
+                            <span>All-Rounder</span>
+                        </button>
+                        <button type="button" class="preset-btn" data-preset="borderline" id="presetBorderlineBtn">
+                            <span>Borderline</span>
+                        </button>
+                        <button type="button" class="preset-btn" data-preset="atrisk" id="presetAtRiskBtn">
+                            <span>Needs Training</span>
+                        </button>
+                    </div>
+                </div>
+
+                <form id="predictionForm" class="prediction-form" onsubmit="return false;">
+                    <!-- Group 1: Academic Scores -->
+                    <div class="form-group-card">
+                        <div class="group-header">
+                            <span class="group-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            </span>
+                            <span class="group-title">Academic Scores</span>
+                        </div>
+
+                        <!-- CGPA Slider -->
+                        <div class="input-control">
+                            <div class="control-label-row">
+                                <label for="cgpaInput">Cumulative GPA (CGPA)</label>
+                                <span class="val-badge" id="cgpaVal">8.0</span>
+                            </div>
+                            <input type="range" id="cgpaInput" name="cgpa" min="5.0" max="10.0" step="0.1" value="8.0" class="custom-slider">
+                            <div class="slider-marks">
+                                <span>5.0</span>
+                                <span>7.5</span>
+                                <span>10.0</span>
+                            </div>
+                        </div>
+
+                        <!-- SSC & HSC Marks Row -->
+                        <div class="grid-2-col">
+                            <div class="input-control">
+                                <div class="control-label-row">
+                                    <label for="sscInput">SSC Marks (%)</label>
+                                    <span class="val-badge" id="sscVal">75%</span>
+                                </div>
+                                <input type="range" id="sscInput" name="ssc_marks" min="40" max="100" step="1" value="75" class="custom-slider">
+                            </div>
+
+                            <div class="input-control">
+                                <div class="control-label-row">
+                                    <label for="hscInput">HSC Marks (%)</label>
+                                    <span class="val-badge" id="hscVal">78%</span>
+                                </div>
+                                <input type="range" id="hscInput" name="hsc_marks" min="40" max="100" step="1" value="78" class="custom-slider">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Group 2: Technical & Practical Skills -->
+                    <div class="form-group-card">
+                        <div class="group-header">
+                            <span class="group-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            </span>
+                            <span class="group-title">Technical & Experience</span>
+                        </div>
+
+                        <!-- Aptitude Test Score -->
+                        <div class="input-control">
+                            <div class="control-label-row">
+                                <label for="aptitudeInput">Aptitude Test Score</label>
+                                <span class="val-badge highlight-badge" id="aptitudeVal">82</span>
+                            </div>
+                            <input type="range" id="aptitudeInput" name="aptitude" min="50" max="100" step="1" value="82" class="custom-slider">
+                            <div class="slider-marks">
+                                <span>50</span>
+                                <span>75</span>
+                                <span>100</span>
+                            </div>
+                        </div>
+
+                        <!-- Steppers Grid -->
+                        <div class="grid-3-col">
+                            <div class="stepper-card">
+                                <label for="projectsInput">Projects</label>
+                                <div class="stepper-widget">
+                                    <button type="button" class="step-btn" data-step="projects" data-dir="-1" id="projectsDecBtn">−</button>
+                                    <input type="number" id="projectsInput" name="projects" min="0" max="10" value="2" readonly>
+                                    <button type="button" class="step-btn" data-step="projects" data-dir="1" id="projectsIncBtn">+</button>
+                                </div>
+                            </div>
+
+                            <div class="stepper-card">
+                                <label for="internshipsInput">Internships</label>
+                                <div class="stepper-widget">
+                                    <button type="button" class="step-btn" data-step="internships" data-dir="-1" id="internshipsDecBtn">−</button>
+                                    <input type="number" id="internshipsInput" name="internships" min="0" max="5" value="1" readonly>
+                                    <button type="button" class="step-btn" data-step="internships" data-dir="1" id="internshipsIncBtn">+</button>
+                                </div>
+                            </div>
+
+                            <div class="stepper-card">
+                                <label for="workshopsInput">Workshops</label>
+                                <div class="stepper-widget">
+                                    <button type="button" class="step-btn" data-step="workshops" data-dir="-1" id="workshopsDecBtn">−</button>
+                                    <input type="number" id="workshopsInput" name="workshops" min="0" max="5" value="1" readonly>
+                                    <button type="button" class="step-btn" data-step="workshops" data-dir="1" id="workshopsIncBtn">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Group 3: Behavioral & Preparation -->
+                    <div class="form-group-card">
+                        <div class="group-header">
+                            <span class="group-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </span>
+                            <span class="group-title">Preparation & Readiness</span>
+                        </div>
+
+                        <!-- Soft Skills Rating -->
+                        <div class="input-control">
+                            <div class="control-label-row">
+                                <label for="softSkillsInput">Soft Skills Rating (out of 5)</label>
+                                <span class="val-badge" id="softSkillsVal">4.5 / 5.0</span>
+                            </div>
+                            <input type="range" id="softSkillsInput" name="soft_skills" min="1.0" max="5.0" step="0.1" value="4.5" class="custom-slider">
+                        </div>
+
+                        <!-- Toggles Grid -->
+                        <div class="grid-2-col toggles-row">
+                            <div class="toggle-card">
+                                <div class="toggle-text">
+                                    <span class="toggle-title">Placement Training</span>
+                                    <span class="toggle-desc">Specialized training programs</span>
+                                </div>
+                                <label class="switch" for="placementTrainingToggle">
+                                    <input type="checkbox" id="placementTrainingToggle" name="placement_training" checked>
+                                    <span class="slider-round"></span>
+                                </label>
+                            </div>
+
+                            <div class="toggle-card">
+                                <div class="toggle-text">
+                                    <span class="toggle-title">Extracurricular</span>
+                                    <span class="toggle-desc">Clubs, sports, hackathons</span>
+                                </div>
+                                <label class="switch" for="extracurricularToggle">
+                                    <input type="checkbox" id="extracurricularToggle" name="extracurricular" checked>
+                                    <span class="slider-round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="runPredictionBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            <span>Calculate Placement Odds</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="resetDefaultsBtn">Reset</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Right Panel: Intelligence & Predictions -->
+            <section class="panel glass-panel result-panel" aria-labelledby="results-heading">
+                <div class="panel-header">
+                    <div>
+                        <h2 id="results-heading" class="panel-title">Placement Forecasting Engine</h2>
+                        <p class="panel-description">Multi-model algorithmic consensus and tailored employability feedback.</p>
+                    </div>
+                </div>
+
+                <!-- Primary Result Card -->
+                <div class="verdict-hero-card" id="verdictCard">
+                    <div class="gauge-wrapper">
+                        <svg class="radial-gauge" viewBox="0 0 120 120">
+                            <circle class="gauge-bg" cx="60" cy="60" r="50"></circle>
+                            <circle class="gauge-fill" id="gaugeFillCircle" cx="60" cy="60" r="50" style="stroke-dashoffset: 80;"></circle>
+                        </svg>
+                        <div class="gauge-inner">
+                            <span class="probability-number" id="probPercent">64.3%</span>
+                            <span class="probability-label">Likelihood</span>
+                        </div>
+                    </div>
+
+                    <div class="verdict-content">
+                        <div class="verdict-badge-row">
+                            <div class="verdict-badge placed" id="verdictBadge">
+                                <span class="verdict-icon" id="verdictIcon">✓</span>
+                                <span class="verdict-text" id="verdictText">LIKELY PLACED</span>
+                            </div>
+                        </div>
+                        <p class="verdict-summary" id="verdictSummary">
+                            Based on your profile, the algorithms predict a strong probability of placement.
+                        </p>
+                        <div class="consensus-strip">
+                            <span class="consensus-label">Ensemble Consensus:</span>
+                            <div class="consensus-bar-wrapper">
+                                <div class="consensus-bar-fill" id="consensusBarFill" style="width: 80%;"></div>
+                            </div>
+                            <span class="consensus-val" id="consensusVal">4 / 5 Agree</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Multi-Model Consensus Grid -->
+                <div class="models-grid-section">
+                    <h3 class="section-subtitle">Multi-Model Algorithmic Breakdown</h3>
+                    <div class="models-grid" id="modelsGrid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Actionable Recommendations Card -->
+                <div class="recommendations-card">
+                    <div class="rec-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="rec-icon">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <h3 class="section-subtitle" style="margin: 0;">Employability Growth Insights</h3>
+                    </div>
+                    <ul class="rec-list" id="recommendationsList">
+                        <li>Evaluating student credentials...</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <!-- Benchmark Comparison Table & Analytics -->
+        <section class="benchmark-section glass-panel" aria-labelledby="benchmarks-heading">
+            <div class="panel-header">
+                <div>
+                    <h2 id="benchmarks-heading" class="panel-title">Model Benchmarks & Performance Matrix</h2>
+                    <p class="panel-description">Empirically evaluated on 2,000 independent test instances across 5 classification algorithms.</p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="benchmark-table" id="benchmarkTable">
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Status</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1-Score</th>
+                            <th>ROC-AUC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for model_name, m in metadata.metrics.items() %}
+                        <tr class="{% if model_name == metadata.best_model %}champion-row{% endif %}">
+                            <td class="model-cell">
+                                <span class="table-model-name">{{ model_name }}</span>
+                                {% if model_name == metadata.best_model %}
+                                    <span class="table-badge-champion">Champion</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="tag-status">Validated</span>
+                            </td>
+                            <td class="metric-num highlight-cell">{{ m.accuracy }}%</td>
+                            <td class="metric-num">{{ m.precision }}%</td>
+                            <td class="metric-num">{{ m.recall }}%</td>
+                            <td class="metric-num highlight-cell">{{ m.f1_score }}%</td>
+                            <td class="metric-num">{{ m.roc_auc }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Feature Impact Visualizer -->
+        <section class="importance-section glass-panel">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Feature Weight & Impact Ranking</h2>
+                    <p class="panel-description">Relative feature coefficients determining student placement outcome.</p>
+                </div>
+            </div>
+            
+            <div class="importance-grid" id="importanceGrid">
+                <!-- Injected via JS or rendered -->
+                {% for feat, score in metadata.feature_importance.items() %}
+                <div class="importance-item">
+                    <div class="importance-label-row">
+                        <span class="feat-name">{{ feat.replace('_Enc', '').replace('/', ' & ') }}</span>
+                        <span class="feat-score">{{ score }}</span>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: {{ (score|abs * 120)|round }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Student Placement Prediction System • Built with Machine Learning & Flask • Pair programmed with Antigravity</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

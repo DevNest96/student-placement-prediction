@@ -2,6 +2,7 @@ import os
 import json
 import joblib
 import numpy as np
+import pandas as pd
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -60,10 +61,10 @@ def parse_student_input(data):
     ssc = float(data.get("ssc_marks", 70))
     hsc = float(data.get("hsc_marks", 70))
     
-    feature_vector = np.array([[
+    feature_vector = pd.DataFrame([[
         cgpa, internships, projects, workshops, aptitude,
         soft_skills, extra, training, ssc, hsc
-    ]])
+    ]], columns=metadata['feature_columns'])
     
     return feature_vector, {
         'CGPA': cgpa,

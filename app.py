@@ -1,13 +1,28 @@
 import os
 import json
 import joblib
+from functools import wraps
 import numpy as np
 import pandas as pd
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+import auth
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "spp-secret-key-2026-secure-session-auth")
 
 MODELS_DIR = os.path.join(os.path.dirname(__file__), "models")
+
+# Authentication helper decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_id = session.get("user_id")
+        if not user_id or not auth.get_user_by_id(user_id):
+            if request.path.startswith("/api/"):
+                return jsonify({"success": False, "error": "Unauthorized. Please sign in."}), 401
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Load models and metadata
 def load_artifacts():
@@ -79,9 +94,52 @@ def parse_student_input(data):
         'HSC_Marks': hsc
     }
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        data = request.get_json(silent=True) or request.form.to_dict()
+        email = data.get("email", "")
+        password = data.get("password", "")
+        
+        success, message, user = auth.authenticate_user(email, password)
+        if success:
+            session["user_id"] = user["id"]
+            session["user_name"] = user["name"]
+            session["user_role"] = user["role"]
+            return jsonify({"success": True, "message": message, "redirect": "/"})
+        return jsonify({"success": False, "message": message}), 400
+
+    # GET request
+    if session.get("user_id") and auth.get_user_by_id(session["user_id"]):
+        return redirect(url_for("index"))
+    return render_template("login.html")
+
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.get_json(silent=True) or request.form.to_dict()
+    name = data.get("name", "")
+    email = data.get("email", "")
+    password = data.get("password", "")
+    role = data.get("role", "Student")
+
+    success, message, user = auth.register_user(name, email, password, role)
+    if success:
+        session["user_id"] = user["id"]
+        session["user_name"] = user["name"]
+        session["user_role"] = user["role"]
+        return jsonify({"success": True, "message": message, "redirect": "/"})
+    return jsonify({"success": False, "message": message}), 400
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
 @app.route("/")
+@login_required
 def index():
-    return render_template("index.html", metadata=metadata)
+    current_user = auth.get_user_by_id(session.get("user_id"))
+    return render_template("index.html", metadata=metadata, current_user=current_user)
 
 @app.route("/api/metadata", methods=["GET"])
 def get_metadata():

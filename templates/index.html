@@ -38,6 +38,22 @@
                     <span class="model-name">Champion: {{ metadata.best_model }}</span>
                     <span class="model-acc">{{ metadata.metrics[metadata.best_model].accuracy }}% Acc</span>
                 </div>
+
+                {% if current_user %}
+                <div class="user-profile-badge">
+                    <div class="user-avatar-circle">
+                        {{ current_user.name[0] }}
+                    </div>
+                    <div class="user-text-info">
+                        <span class="user-name-display">{{ current_user.name }}</span>
+                        <span class="user-role-display">{{ current_user.role }}</span>
+                    </div>
+                </div>
+                <a href="/logout" class="btn-logout" title="Sign Out">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <span>Logout</span>
+                </a>
+                {% endif %}
             </div>
         </header>
 
